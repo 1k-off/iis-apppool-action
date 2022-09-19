@@ -1,0 +1,43 @@
+name: 'IIS Application Pool Action'
+
+description: 'This action can restart, start or stop an IIS application pool, or get information about its state.'
+
+inputs:
+  action:
+    description: Specify get-state, restart, start, stop as the action to perform
+    required: true
+  appPoolName:
+    description: 'IIS application pool name'
+    required: true
+  siteName:
+    description: 'IIS site name'
+    required: true
+outputs:
+  state:
+    description: "Application pool state"
+    value: ${{ steps.iis_application_pool.outputs.state }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Set IIS app pool name
+      id: set_app_pool_name
+      shell: powershell
+      run: |
+        if ("${{ inputs.appPoolName }}" -ne ""){
+          Write-Host "::set-output name=appPoolName::${{ inputs.appPoolName }}"
+        } elseif ("${{ inputs.appPoolName }}" -eq "" -And "${{ inputs.siteName }}" -ne "") {
+          $s = Get-IISSite -Name "${{ inputs.siteName }}" -WarningAction:SilentlyContinue
+          if ($null -eq "$s") {
+            Write-Host "IIS site $SiteName does not exist"
+            exit 1
+          }
+          $p = ((Get-IISSite -Name "${{ inputs.siteName }}").Applications | Where-Object {$_.Path -eq "/" }).ApplicationPoolName
+          Write-Host "::set-output name=appPoolName::$p"
+        } else {
+          Write-Host "You should fill one of these variables: 'appPoolName' or 'siteName'."
+        }
+
+    - name: IIS application pool
+      id: iis_application_pool
+      shell: powershell
+      run: ${{ github.action_path }}/ApplicationPool.ps1 -Action "${{ inputs.action }}" -AppPoolName "${{ steps.set_app_pool_name.outputs.appPoolName }}"

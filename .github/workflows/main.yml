@@ -1,0 +1,27 @@
+name: Create release
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Bump version and push tag
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.40.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          WITH_V: false
+          DEFAULT_BUMP: patch
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: ${{ steps.bump_version.outputs.tag }}
+          release_name: Release ${{ steps.bump_version.outputs.tag }}
