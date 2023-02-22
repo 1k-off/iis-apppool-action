@@ -15,13 +15,13 @@ jobs:
         id: bump_version
         uses: anothrNick/github-tag-action@1.40.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: false
           DEFAULT_BUMP: patch
       - name: Create Release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.bump_version.outputs.tag }}
           release_name: Release ${{ steps.bump_version.outputs.tag }}
