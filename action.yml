@@ -1,6 +1,6 @@
-name: 'IIS Application Pool Action'
+name: IIS Application Pool Action
 
-description: 'This action can restart, start or stop an IIS application pool, or get information about its state.'
+description: This action can restart, start or stop an IIS application pool, or get information about its state.
 
 inputs:
   action:
@@ -13,20 +13,20 @@ inputs:
       - stop
     required: true
   appPoolName:
-    description: 'IIS application pool name'
+    description: IIS application pool name
     required: true
   siteName:
-    description: 'IIS site name'
+    description: IIS site name
     required: true
 outputs:
   appPoolName:
-    description: "Application pool name"
+    description: Application pool name
     value: ${{ steps.iis_application_pool.outputs.appPoolName }}
   state:
-    description: "Application pool state"
+    description: Application pool state
     value: ${{ steps.iis_application_pool.outputs.state }}
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - name: Set IIS app pool name
       id: set_app_pool_name
