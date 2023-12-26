@@ -1,30 +1,39 @@
-name: 'IIS Application Pool Action'
+name: IIS Application Pool Action
 
-description: 'This action can restart, start or stop an IIS application pool, or get information about its state.'
+description: This action can restart, start or stop an IIS application pool, or get information about its state.
 
 inputs:
   action:
     description: Specify get-state, restart, start, stop as the action to perform
+    type: choice
+    options:
+      - get-state
+      - restart
+      - start
+      - stop
     required: true
   appPoolName:
-    description: 'IIS application pool name'
+    description: IIS application pool name
     required: true
   siteName:
-    description: 'IIS site name'
+    description: IIS site name
     required: true
 outputs:
+  appPoolName:
+    description: Application pool name
+    value: ${{ steps.iis_application_pool.outputs.appPoolName }}
   state:
-    description: "Application pool state"
+    description: Application pool state
     value: ${{ steps.iis_application_pool.outputs.state }}
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - name: Set IIS app pool name
       id: set_app_pool_name
       shell: powershell
       run: |
         if ("${{ inputs.appPoolName }}" -ne ""){
-          Write-Host "::set-output name=appPoolName::${{ inputs.appPoolName }}"
+          Write-Output "appPoolName=${{ inputs.appPoolName }}" >> $ENV:GITHUB_OUTPUT
         } elseif ("${{ inputs.appPoolName }}" -eq "" -And "${{ inputs.siteName }}" -ne "") {
           $s = Get-IISSite -Name "${{ inputs.siteName }}" -WarningAction:SilentlyContinue
           if ($null -eq "$s") {
@@ -32,7 +41,7 @@ runs:
             exit 1
           }
           $p = ((Get-IISSite -Name "${{ inputs.siteName }}").Applications | Where-Object {$_.Path -eq "/" }).ApplicationPoolName
-          Write-Host "::set-output name=appPoolName::$p"
+          Write-Output "appPoolName=$p" >> $ENV:GITHUB_OUTPUT
         } else {
           Write-Host "You should fill one of these variables: 'appPoolName' or 'siteName'."
         }
