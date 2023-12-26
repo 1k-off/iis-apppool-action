@@ -15,6 +15,7 @@ Required: [IISAdministration](https://learn.microsoft.com/en-us/powershell/modul
 ## Examples
 
 ```yaml
+...
 jobs:
   example:
     runs-on: [self-hosted, deploy]
@@ -27,9 +28,11 @@ jobs:
           siteName: "Default Web Site"
           appPoolName:
       - run: Write-Host "App pool for the Default Web Site ${{ steps.start_app_pool.outputs.state }}"
+...
 ```
 
 ```yaml
+...
 jobs:
   example:
     runs-on: [self-hosted, deploy]
@@ -42,4 +45,5 @@ jobs:
           siteName:
           appPoolName: "Default Web Site"
       - run: Write-Host "App pool for the Default Web Site ${{ steps.start_app_pool.outputs.state }}"
+...
 ```
