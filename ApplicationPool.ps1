@@ -16,7 +16,7 @@ function __getState {
     )
     $pool = Get-IISAppPool -Name "$AppPoolName"
     $state = $pool.State
-    Write-Host "::set-output name=state::$state"
+    Write-Output "state=$state" >> $ENV:GITHUB_OUTPUT
     Write-Host "IIS application pool $AppPoolName $state"
 }
 
@@ -28,8 +28,8 @@ function __restart {
     $__state = (Get-IISAppPool -Name "$AppPoolName").State
     if ($__state -eq "Stopped") {
         Write-Host "IIS application pool $AppPoolName is in stopped state now. You can't restart stopped application pool"
-        exit 
-    } 
+        exit
+    }
     Restart-WebAppPool -Name "$AppPoolName"
     Write-Host "IIS application pool $AppPoolName restarted."
 }
@@ -51,8 +51,8 @@ function __stop {
     $__state = (Get-IISAppPool -Name "$AppPoolName").State
     if ($__state -eq "Stopped") {
         Write-Host "IIS application pool $AppPoolName already stopped."
-        exit 
-    } 
+        exit
+    }
     $__pid = $true
     $__sleep = 5
     Stop-WebAppPool -Name "$AppPoolName"
@@ -90,19 +90,19 @@ function __checkAppPoolExists {
 function DoAction {
     Param(
         [Parameter(Mandatory = $true)]
-        [string]$Action    
+        [string]$Action
     )
     switch ($Action) {
-        "get-state" { 
+        "get-state" {
             __getState -AppPoolName "$AppPoolName"
          }
-        "restart" { 
+        "restart" {
             __restart -AppPoolName "$AppPoolName"
          }
-        "start" { 
+        "start" {
             __start -AppPoolName "$AppPoolName"
          }
-        "stop" { 
+        "stop" {
             __stop -AppPoolName "$AppPoolName"
          }
     }
